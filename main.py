@@ -1,42 +1,30 @@
-import json
-from datetime import datetime
+def mask_card(card_number):
+    return ' '.join(['XXXX XXXX XXXX ' + card_number[-4:]] if card_number else [])
 
-def load_operations_from_file(filepath):
-    with open(filepath, 'r', encoding='utf-8') as file:
-        return json.load(file)
 
-def mask_card_number(card_number):
-    parts = card_number.split()
-    return f"{parts[0]} {parts[1][:2]}** **** {parts[3]}"
+def mask_account(account_number):
+    return '**** ' + account_number[-4:]
 
-def mask_account_number(account_number):
-    return f"**{account_number[-4:]}"
-
-def format_date(date_string):
-    date = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%S.%f')
-    return date.strftime('%d.%m.%Y')
-
-def get_last_operations(operations):
-    executed_operations = [op for op in operations if op.get('state') == 'EXECUTED']
-    sorted_operations = sorted(executed_operations, key=lambda x: datetime.strptime(x['date'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True)
-    return sorted_operations[:5]
 
 def format_operation(operation):
-    formatted_date = format_date(operation['date'])
-    masked_from = mask_card_number(operation['from']) if 'from' in operation else 'N/A'
-    masked_to = mask_account_number(operation['to'])
-    amount = operation['operationAmount']['amount']
-    currency = operation['operationAmount']['currency']['name']
+    date = datetime.fromisoformat(operation['date'][:-1]).strftime('%d.%m.%Y')
     description = operation['description']
+    from_account = mask_card(operation['from']) if 'from' in operation else 'Внутренний перевод'
+    to_account = mask_account(operation['to'])
+    amount = operation['operationAmount']['amount']
+    currency = operation['operationAmount']['currency']
 
-    return f"{formatted_date} {description}\n{masked_from} -> {masked_to}\n{amount} {currency}\n"
+    return f"{date} {description}\n{from_account} -> {to_account}\n{amount} {currency}"
 
-def main():
-    operations = load_operations_from_file('operations.json')
-    last_operations = get_last_operations(operations)
+
+def display_last_operations(operations):
+    executed_operations = [op for op in operations if op['state'] == 'EXECUTED']
+    last_operations = executed_operations[-5:][::-1]  # последние 5, в обратном порядке
+
     for operation in last_operations:
-        formatted_output = format_operation(operation)
-        print(formatted_output)
+        print(format_operation(operation))
+        print()  # пустая строка между операциями
 
-if __name__ == '__main__':
-    main()
+
+# Пример вызова
+display_last_operations(operations)

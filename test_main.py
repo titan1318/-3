@@ -1,15 +1,8 @@
 import pytest
-from main import mask_card_number, mask_account_number, format_date, get_last_operations
+from main import mask_card, mask_account
 
-def test_mask_card_number():
+def test_mask_card():
+    assert mask_card('1234567890123456') == 'XXXX XXXX XXXX 3456'
 
-def test_mask_account_number():
-
-def test_format_date():
-
-def test_get_last_operations():
-    operations = [
-    ]
-
-if __name__ == "__main__":
-    pytest.main()
+def test_mask_account():
+    assert mask_account('123456789012') == '**** 9012'
