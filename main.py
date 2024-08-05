@@ -1,11 +1,18 @@
 import json
-from transactions import print_last_transactions
+from utils import get_filtered_and_sorted
+from utils import prepare_user_msg
 
-# Загрузка данных из файла
-def load_transactions(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+
+def main():
+    with open("operations.json", "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    items = get_filtered_and_sorted(data)
+
+    for i in range(5):
+        print(prepare_user_msg(items[i]))
+        print()
+
 
 if __name__ == "__main__":
-    transactions = load_transactions('operations.json')
-    print_last_transactions(transactions)
+    main()
