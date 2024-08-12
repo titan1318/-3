@@ -55,3 +55,4 @@ def mask_card_number(number: str):
         return f"{number[:4]} {number[4:6]}** **** {number[-4:]}"
     else:
         raise ValueError("Номер карты  не валидный")
+
